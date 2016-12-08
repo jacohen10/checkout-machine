@@ -2,14 +2,15 @@ class CheckoutMachine
   def initialize
     @balance = 0
     @bonus_card_scanned = false
-    @salsa_counter = 0
-    @chip_counter = 0
+    @item_counter = {}
   end
 
   def scan(sku)
-    update_balance(sku)
-
-    @bonus_card_scanned = true if sku == 000
+    if sku == 000
+      @bonus_card_scanned = true
+    else
+      update_balance(sku)
+    end
   end
 
   def total
@@ -21,22 +22,15 @@ class CheckoutMachine
 
   def apply_discount
     if @bonus_card_scanned
-      @balance -= 50 * @salsa_counter
-      @balance -= 200 * (@chip_counter/3).floor
+      @item_counter.each do |sku, value|
+        @balance -= Item.new(sku, value).discount
+      end
     end
   end
 
-  def update_balance(sku)
-    if sku == 123
-      @chip_counter += 1
-      @balance += 200
-    elsif sku == 456
-      @salsa_counter += 1
-      @balance += 100
-    elsif sku == 789
-      @balance += 1000
-    elsif sku == 111
-      @balance += 550
-    end
+  def update_balance
+    item = Item.new(sku)
+    @balance += item.price
+    @counter["#{sku}"] += 1 if item.discounted?
   end
 end
