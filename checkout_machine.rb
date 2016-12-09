@@ -9,7 +9,7 @@ class CheckoutMachine
   def scan(sku)
     update_balance(sku)
 
-    @bonus_card_scanned = true if sku == 000
+    @dan_the_man = false if sku == 010
   end
 
   def total
